@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+
+<div class="p-5 mb-4 bg-dark text-white rounded-3 shadow text-center">
+    <h1 class="display-6 fw-bold">Bienvenue, {{ app.user.email }}</h1>
+    <p class="fs-5">Gérez vos clients et vos activités professionnelles depuis votre tableau de bord.</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary h-100 text-center">
+            <div class="card-body">
+                <h5 class="card-title">Clients</h5>
+                <p class="display-6">{{ clients|length }}</p>
+                <a href="{{ path('app_client_index') }}" class="btn btn-light btn-sm">Voir</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success h-100 text-center">
+            <div class="card-body">
+                <h5 class="card-title">Statut</h5>
+                <p class="fs-5">Système opérationnel</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning h-100 text-center">
+            <div class="card-body">
+                <h5 class="card-title">Compte</h5>
+                <p class="fs-5">Utilisateur actif</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Derniers clients -->
+<div class="card shadow">
+    <div class="card-header fw-bold bg-white">Derniers clients</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Société</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients|slice(0,5) %}
+                    <tr>
+                        <td>{{ client.nom }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.telephone }}</td>
+                        <td>{{ client.Societe }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">Aucun client</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

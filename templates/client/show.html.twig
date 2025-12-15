@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Client{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+
+    <!-- Hero / titre -->
+    <div class="p-4 mb-4 bg-info text-white rounded-3 shadow-sm">
+        <h1 class="display-6 fw-bold">Détails du client</h1>
+        <p class="fs-6">Visualisez toutes les informations du client sélectionné.</p>
+    </div>
+
+    <!-- Card avec informations client -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <th>Id</th>
+                        <td>{{ client.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom</th>
+                        <td>{{ client.nom }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ client.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Téléphone</th>
+                        <td>{{ client.telephone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Société</th>
+                        <td>{{ client.Societe }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="mb-4 d-flex gap-2">
+        <a href="{{ path('app_client_index') }}" class="btn btn-outline-primary">Retour à la liste</a>
+        <a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-warning">Modifier</a>
+        {{ include('client/_delete_form.html.twig') }}
+    </div>
+
+</div>
+{% endblock %}
