@@ -17,8 +17,10 @@ final class ClientController extends AbstractController
     #[Route(name: 'app_client_index', methods: ['GET'])]
     public function index(ClientRepository $clientRepository): Response
     {
-        return $this->render('client/index.html.twig', [
-            'clients' => $clientRepository->findAll(),
+        $user = $this->getUser();
+
+        return $this->render('client/gestion.html.twig', [
+            'clients' => $clientRepository->findBy(['user' => $user]),
         ]);
     }
 
@@ -26,14 +28,18 @@ final class ClientController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $client = new Client();
+        $client->setUser($this->getUser()); // Associe l'utilisateur connecté
         $form = $this->createForm(ClientType::class, $client);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $client->setCreatedAt(new \DateTime());
             $entityManager->persist($client);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Le client "' . $client->getNom() . '" a été ajouté avec succès !');
+
+            return $this->redirectToRoute('app_dashboard');
         }
 
         return $this->render('client/new.html.twig', [
@@ -58,6 +64,7 @@ final class ClientController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            $this->addFlash('success', 'Le client "' . $client->getNom() . '" a été mis à jour !');
 
             return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -71,9 +78,10 @@ final class ClientController extends AbstractController
     #[Route('/{id}', name: 'app_client_delete', methods: ['POST'])]
     public function delete(Request $request, Client $client, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$client->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $client->getId(), $request->request->get('_token'))) {
             $entityManager->remove($client);
             $entityManager->flush();
+            $this->addFlash('success', 'Le client "' . $client->getNom() . '" a été supprimé.');
         }
 
         return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);

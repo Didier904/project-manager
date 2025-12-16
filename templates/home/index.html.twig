@@ -1,54 +1,198 @@
+{# home.html.twig – Homepage inspiration KWANTIC #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Bienvenue{% endblock %}
+{% block title %}KAMIKASSE – Agence digitale de croissance{% endblock %}
 
 {% block body %}
+
+<!-- HERO -->
+<section class="vh-100 d-flex align-items-center" style="background: radial-gradient(circle at top,rgb(141, 136, 136),rgb(4, 1, 197));">
+    <div class="container text-center">
+        <div class="glass p-5 mx-auto fade-in" style="max-width: 900px; backdrop-filter: blur(15px);">
+            <h1 class="display-3 fw-bold mb-4 text-light" style="text-shadow: 0 8px 30px rgba(0,0,0,0.6);">
+                Bienvenue chez <span class="text-success fw-bold"> KAMIKASSE </span><br>
+                Découvrez-nous pour plonger dans l'univers du web ensemble.
+            </h1>
+            <p class="fs-5 mb-5 text-light" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+              Nous sommes une agence digitale orientée performance, spécialisée
+                dans la création de sites web à fort impact business et la gestion de ses clients.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="#contact" class="btn btn-primary btn-lg">Démarrer un projet</a>
+                <a href="#method" class="btn btn-outline-light btn-lg">Notre méthode</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AGENCE -->
+<section id="about" class="mt-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <!-- Card contenant texte + image -->
+            <div class="col-md-12">
+                <div class="glass p-5 d-flex flex-wrap align-items-center fade-in" style="
+                    background: rgba(255,255,255,0.08);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1.5rem;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                ">
+                    <!-- Texte -->
+                    <div class="col-md-6 pe-4">
+                        <h2 class="fw-bold mb-4 text-light">Une agence produit & croissance</h2>
+                        <p class="fs-5 text-light">
+                            Nous accompagnons les entreprises qui veulent aller vite, fort et durablement.
+                        </p>
+                        <ul class="list-unstyled fs-5 mt-3 text-light">
+                            <li>✔️ Stratégie digitale</li>
+                            <li>✔️ Design UI/UX premium</li>
+                            <li>✔️ Développement web & app</li>
+                            <li>✔️ Optimisation & gestion des clients</li>
+                        </ul>
+                    </div>
+
+                    <!-- Image -->
+                    <div class="col-md-6">
+                        <img src="/images/fond1.png" alt="Agence" class="img-fluid rounded-3 shadow-lg image-hover" style="object-fit: cover; width: 100%; height: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VALEUR -->
+<section class="mt-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h4 class="fw-bold text-light">Exigence</h4>
+                    <p style="color:#e0e0e0;">Aucun compromis sur la qualité et la performance. Nous vous proposerons exactement ce que vous désirez !</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h4 class="fw-bold text-light">Vision</h4>
+                    <p style="color:#e0e0e0;">Chaque projet est pensé long terme. Ayant des experts dans ce domaine vous ne serez point déçu.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h4 class="fw-bold text-light">Avantages</h4>
+                    <p style="color:#e0e0e0;">Des résultats concrets et mesurables, si insatisfaction signaler on corrigera l'erreur est humaine !</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- METHODE -->
+<section id="method" class="mt-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5 text-light fade-in">Notre méthode</h2>
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.12);
+                    border: 1px solid rgba(255,255,255,0.15);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h5 class="fw-bold text-light">01. Analyse</h5>
+                    <p style="color: #d1d1d1;">Comprendre vos enjeux business</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.12);
+                    border: 1px solid rgba(255,255,255,0.15);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h5 class="fw-bold text-light">02. Stratégie</h5>
+                    <p style="color: #d1d1d1;">Construire une vision claire</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.12);
+                    border: 1px solid rgba(255,255,255,0.15);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h5 class="fw-bold text-light">03. Production</h5>
+                    <p style="color: #d1d1d1;">Designer et développer vite</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass p-4 h-100 fade-in" style="
+                    background: rgba(255,255,255,0.12);
+                    border: 1px solid rgba(255,255,255,0.15);
+                    backdrop-filter: blur(15px);
+                    border-radius: 1rem;
+                ">
+                    <h5 class="fw-bold text-light">04. Croissance</h5>
+                    <p style="color: #d1d1d1;">Optimiser, scaler, performer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section id="contact" class="mt-5">
+    <div class="container text-center">
+        <div class="glass p-5 fade-in" style="
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(15px);
+            border-radius: 1rem;
+        ">
+            <h2 class="fw-bold mb-3 text-light">Prêt à accélérer ?</h2>
+            <p class="fs-5 mb-4" style="color: #cfd4da;">Parlons de votre projet dès maintenant.</p>
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg">Accéder à l'espace</a>
+        </div>
+    </div>
+</section>
+
+<!-- Animations CSS -->
 <style>
-    .glass {
-        position: relative;
-        background: rgba(255, 255, 255, 0.15); /* Blanc transparent */
-        backdrop-filter: blur(10px) saturate(150%);
-        -webkit-backdrop-filter: blur(10px) saturate(150%);
-        border-radius: 2rem; /* Coins arrondis */
-        border: 1px solid rgba(255, 255, 255, 0.3); /* Bord légèrement visible */
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Ombre douce */
-        overflow: hidden; /* Pour que le pseudo-élément reste à l'intérieur */
-        color: white; /* Texte en blanc */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 1s forwards;
+        animation-delay: 0.2s;
+    }
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .glass::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 2rem;
-        background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%);
-        pointer-events: none;
+    .image-hover img {
+        transition: transform 0.5s ease;
     }
-
-    /* Optionnel : boutons avec texte blanc */
-    .glass .btn-success {
-        color: white;
+    .image-hover img:hover {
+        transform: scale(1.05);
     }
 </style>
 
-<div class="container d-flex align-items-center justify-content-center vh-100">
-    <div class="glass p-5 text-center col-md-8 col-lg-6">
-
-        <h1 class="display-4 fw-bold mb-3">Bienvenue sur KAMIKASSE</h1>
-
-        <p class="fs-5 mb-4">
-            <strong>KAMIKASSE</strong> est votre plateforme sécurisée
-            pour gérer vos clients, données et activités professionnelles.
-        </p>
-
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{{ path('app_register') }}" class="btn btn-success btn-lg px-4">
-                Accéder
-            </a>
-        </div>
-    </div>
-</div>
 {% endblock %}

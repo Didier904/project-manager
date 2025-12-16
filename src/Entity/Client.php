@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ClientRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -23,7 +24,19 @@ class Client
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Societe = null;
+    private ?string $societe = null;
+
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'clients')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $user = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -34,11 +47,9 @@ class Client
     {
         return $this->nom;
     }
-
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -46,11 +57,9 @@ class Client
     {
         return $this->email;
     }
-
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -58,23 +67,39 @@ class Client
     {
         return $this->telephone;
     }
-
     public function setTelephone(string $telephone): static
     {
         $this->telephone = $telephone;
-
         return $this;
     }
 
     public function getSociete(): ?string
     {
-        return $this->Societe;
+        return $this->societe;
+    }
+    public function setSociete(string $societe): static
+    {
+        $this->societe = $societe;
+        return $this;
     }
 
-    public function setSociete(string $Societe): static
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        $this->Societe = $Societe;
+        return $this->createdAt;
+    }
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 }

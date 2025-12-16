@@ -33,6 +33,7 @@ security:
                 secret: '%kernel.secret%'
                 lifetime: 604800 # 7 jours
                 path: /
+                always_remember_me: false
 
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
