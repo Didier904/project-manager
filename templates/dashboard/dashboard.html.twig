@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Premium SaaS{% endblock %}
+
+{% block body %}
+<div class="dashboard-container" style="min-height:100vh; padding:2rem; background: linear-gradient(135deg,rgb(160,152,152),hsl(239,100%,53%));">
+
+    {# Flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Bannière de bienvenue #}
+    <div class="p-5 mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-4 shadow-lg text-center">
+        <h1 class="display-5 fw-bold">Bienvenue, {{ app.user.email }}</h1>
+        <p class="fs-5">Gérez vos clients et vos activités professionnelles depuis votre tableau de bord.</p>
+    </div>
+
+    {# Cartes KPI #}
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-lg border-0 hover-scale">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill display-4 mb-2"></i>
+                    <h5 class="card-title">Total Clients</h5>
+                    <p class="display-6">{{ totalClients }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-lg border-0 hover-scale">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-check-fill display-4 mb-2"></i>
+                    <h5 class="card-title">Clients actifs ce mois</h5>
+                    <p class="display-6">{{ activeClientsThisMonth }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow-lg border-0 hover-scale">
+                <div class="card-body text-center">
+                    <i class="bi bi-currency-dollar display-4 mb-2"></i>
+                    <h5 class="card-title">Revenus estimés</h5>
+                    <p class="display-6">$ {{ revenus|default(0) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-lg border-0 hover-scale">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock-fill display-4 mb-2"></i>
+                    <h5 class="card-title">Système</h5>
+                    <p class="display-6">En ligne</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Graphiques #}
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header fw-bold bg-white">Évolution des clients</div>
+                <div class="card-body">
+                    <canvas id="clientsEvolutionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header fw-bold bg-white">Répartition par société</div>
+                <div class="card-body">
+                    <canvas id="clientsSocieteChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Top 5 clients récents #}
+    <div class="card shadow mb-4">
+        <div class="card-header fw-bold bg-white d-flex justify-content-between align-items-center">
+            <span>Top 5 clients récents</span>
+            <div class="d-flex gap-2">
+                <input type="text" id="clientSearch" class="form-control form-control-sm" placeholder="Rechercher...">
+                <a href="{{ path('app_client_new') }}" class="btn btn-sm btn-primary">Nouveau client</a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 table-striped" id="clientsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Société</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in topClients %}
+                        <tr>
+                            <td>{{ client.nom }}</td>
+                            <td>{{ client.email }}</td>
+                            <td>{{ client.telephone }}</td>
+                            <td>{{ client.societe }}</td>
+                            <td>
+                                <a href="{{ path('app_client_show', {'id': client.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                                <a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun client</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# Notifications clients du jour #}
+    <div class="card shadow mb-4">
+        <div class="card-header fw-bold bg-white">Notifications</div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for client in newClientsToday %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Nouveau client ajouté : {{ client.nom }}
+                        <span class="badge bg-success rounded-pill">{{ client.createdAt|date('H:i') }}</span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item text-muted">Aucun nouveau client aujourd'hui</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Animation hover cartes KPI
+    document.querySelectorAll('.hover-scale').forEach(card => {
+        card.addEventListener('mouseenter', () => card.style.transform = 'scale(1.05)');
+        card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
+        card.style.transition = 'transform 0.3s';
+    });
+
+    // Graphique évolution clients
+    const ctx1 = document.getElementById('clientsEvolutionChart').getContext('2d');
+    const clientsEvolutionChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: {{ clientsEvolutionLabels|json_encode|raw }},
+            datasets: [{
+                label: 'Nouveaux clients',
+                data: {{ clientsEvolutionData|json_encode|raw }},
+                backgroundColor: 'rgba(54,162,235,0.2)',
+                borderColor: 'rgba(54,162,235,1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // Graphique répartition par société
+    const ctx2 = document.getElementById('clientsSocieteChart').getContext('2d');
+    const clientsSocieteChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: {{ societeLabels|json_encode|raw }},
+            datasets: [{
+                label: 'Clients par société',
+                data: {{ societeCounts|json_encode|raw }},
+                backgroundColor: [
+                    'rgba(255,99,132,0.6)',
+                    'rgba(54,162,235,0.6)',
+                    'rgba(255,206,86,0.6)',
+                    'rgba(75,192,192,0.6)',
+                    'rgba(153,102,255,0.6)',
+                    'rgba(255,159,64,0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // Filtre recherche clients
+    document.getElementById('clientSearch').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll('#clientsTable tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

@@ -1,17 +1,226 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}KAMIKASSE – Agence digitale{% endblock %}</title>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('favicon/kamikasse.png') }}">
+
+    {% block stylesheets %}{% endblock %}
+
+    <style>
+        /* GLOBAL */
+        body {
+            background: url('{{ asset('images/fond2.png') }}') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            letter-spacing: -0.03em;
+        }
+
+        section {
+            padding: 6rem 0;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            backdrop-filter: blur(12px);
+            background: rgba(2, 6, 23, 0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            height: 120px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 0.35em;
+            font-size: 1.6rem;
+        }
+
+        .navbar-brand img {
+            height: 64px;
+            width: auto;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            margin-left: 1.5rem;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-link:hover {
+            color: #ffffff !important;
+        }
+
+        /* GLASS */
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(14px);
+            border-radius: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            border-radius: 999px;
+            padding: 0.8rem 2.2rem;
+            font-weight: 600;
+        }
+
+        .btn-outline-light {
+            border-radius: 999px;
+            padding: 0.8rem 2.2rem;
+            font-weight: 600;
+        }
+
+        /* FOOTER PREMIUM */
+        .footer-premium {
+            background: linear-gradient(180deg, #020617, #020617);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            margin-top: auto;
+        }
+
+        .footer-premium h5,
+        .footer-premium h6 {
+            letter-spacing: 0.04em;
+        }
+
+        .footer-premium p {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('home') }}">
+            <img src="{{ asset('favicon/kamikasse.png') }}" alt="Kamikasse logo">
+            <span>KAMIKASSE</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item"><a class="nav-link" href="{{ path('home') }}">Agence</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('home')}}">Services</a></li>
+
+                {% if app.user %}
+                    <li class="nav-item"><span class="nav-link">{{ app.user.email }}</span></li>
+                    <li class="nav-item">
+                        <a href="{{ path('app_logout') }}" class="btn btn-outline-light btn-sm ms-4">Déconnexion</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Connexion</a></li>
+                    <li class="nav-item">
+                        <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm ms-4">Accéder</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<main style="margin-top: 120px; flex: 1;">
+    {% block body %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer-premium py-5">
+    <div class="container">
+        <div class="row gy-4">
+
+            <!-- COL 1 -->
+            <div class="col-md-4">
+                <h5 class="fw-bold mb-3">KAMIKASSE</h5>
+                <p class="mb-3"> est une agence digitale spécialisée dans la création de site internet, d'application mobile, et aussi dans la gestion d'entreprises.</p>
+                <hr>
+                <h5 class="fw-bold mb-3">NOTRE OBJETIF</h5>
+                <p class="mb-3">Les nouvelles technolgies du digital pour répondre à toute vos attentes !</p>
+                <br>
+                <p class="small mb-0">© {{ "now"|date("Y") }} KAMIKASSE. Tous droits réservés.</p>
+            </div>
+
+            <!-- COL 2 -->
+            <div class="col-md-4 text-center">
+                <h6 class="fw-bold mb-3">Navigation</h6>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="#about">Agence</a></li>
+                    <li><a href="#method">Services</a></li>
+                    <li><a href="{{ path('app_register') }}">Espace client</a></li>
+                </ul>
+            </div>
+
+            <!-- COL 3 -->
+            <div class="col-md-4 text-center">
+                <h6 class="fw-bold mb-3">NOUS CONTACTER</h6>
+                <p class="mb-1"> service@kamikasse.fr</p>
+                <p class="mb-3"> Lundi au Vendredi / 08h - 19h</p>
+                <p class="mb-3">France · Europe</p>
+
+                <!-- Bouton pour afficher le numéro -->
+                <button id="show-phone" class="btn btn-primary btn-sm mb-3 d-block mx-auto">Afficher le numéro</button>
+                
+                <!-- Numéro affiché au-dessus du bouton "Démarrer un projet" -->
+                <p id="phone-number" class="mb-3" style="display:none; font-weight:600;">+33 1 23 45 67 89</p>
+
+                <a href="#contact" class="btn btn-primary btn-sm d-block mx-auto">Démarrer un projet</a>
+            </div>
+
+        </div>
+    </div>
+</footer>
+
+<script>
+    const button = document.getElementById('show-phone');
+    const phone = document.getElementById('phone-number');
+
+    button.addEventListener('click', () => {
+        phone.style.display = phone.style.display === 'none' ? 'block' : 'none';
+        button.textContent = phone.style.display === 'block' ? 'Masquer le numéro' : 'Afficher le numéro';
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block javascripts %}{% endblock %}
+
+</body>
 </html>

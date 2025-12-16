@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouveau client{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+
+    <!-- Hero / Titre -->
+    <div class="p-4 mb-4 bg-success text-white rounded-3 shadow-sm">
+        <h1 class="display-6 fw-bold">Créer un nouveau client</h1>
+        <p class="fs-6">Remplissez le formulaire ci-dessous pour ajouter un client à votre entreprise.</p>
+    </div>
+
+    <!-- Card avec formulaire stylé -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            {{ include('client/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+        </div>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="mb-4">
+        <a href="{{ path('app_client_index') }}" class="btn btn-outline-primary">Retour à la liste</a>
+    </div>
+
+</div>
+{% endblock %}
