@@ -38,7 +38,8 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }   # autorise l'inscription
-        - { path: ^/, roles: ROLE_USER }               # tout le reste nécessite login
+        - { path: ^/client, roles: ROLE_USER }       # tous les utilisateurs connectés
+        - { path: ^/, roles: ROLE_USER }     
 
 when@test:
     security:

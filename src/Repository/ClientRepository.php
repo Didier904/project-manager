@@ -6,9 +6,8 @@ use App\Entity\Client;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Client>
- */
+use Doctrine\ORM\QueryBuilder;
+
 class ClientRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +15,39 @@ class ClientRepository extends ServiceEntityRepository
         parent::__construct($registry, Client::class);
     }
 
-    //    /**
-    //     * @return Client[] Returns an array of Client objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Recherche globale sur tous les clients
+     * @param string|null $q
+     * @return Client[]
+     */
+    public function searchGlobal(?string $q): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->orderBy('c.createdAt', 'DESC');
 
-    //    public function findOneBySomeField($value): ?Client
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($q) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('c.nom', ':q'),
+                    $qb->expr()->like('c.email', ':q'),
+                    $qb->expr()->like('c.societe', ':q')
+                )
+            )
+                ->setParameter('q', '%' . $q . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Retourne tous les clients triés par date de création
+     * @return Client[]
+     */
+    public function findAllOrdered(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

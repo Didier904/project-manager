@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dashboard Premium SaaS{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block body %}
 <div class="dashboard-container" style="min-height:100vh; padding:2rem; background: linear-gradient(135deg,rgb(160,152,152),hsl(239,100%,53%));">
@@ -54,8 +54,14 @@
             <div class="card bg-info text-white shadow-lg border-0 hover-scale">
                 <div class="card-body text-center">
                     <i class="bi bi-clock-fill display-4 mb-2"></i>
-                    <h5 class="card-title">Système</h5>
-                    <p class="display-6">En ligne</p>
+                    <h5 class="card-title">Top 5 récents</h5>
+                    <ul class="list-unstyled mb-0">
+                        {% for client in topClients %}
+                            <li>{{ client.nom }}</li>
+                        {% else %}
+                            <li>Aucun client récent</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
@@ -81,15 +87,16 @@
         </div>
     </div>
 
-    {# Top 5 clients récents #}
+    {# Barre recherche + Nouveau client (Sow uniquement) #}
+    <div class="d-flex justify-content-between align-items-center mb-3 gap-3 flex-wrap">
+        <input type="text" id="clientSearch" class="form-control flex-grow-1" placeholder="Rechercher par nom, email, société...">
+        {% if app.user.email == 'sowbassirou926@mail.com' %}
+            <a href="{{ path('app_client_new') }}" class="btn btn-primary">Nouveau client</a>
+        {% endif %}
+    </div>
+
+    {# Table clients #}
     <div class="card shadow mb-4">
-        <div class="card-header fw-bold bg-white d-flex justify-content-between align-items-center">
-            <span>Top 5 clients récents</span>
-            <div class="d-flex gap-2">
-                <input type="text" id="clientSearch" class="form-control form-control-sm" placeholder="Rechercher...">
-                <a href="{{ path('app_client_new') }}" class="btn btn-sm btn-primary">Nouveau client</a>
-            </div>
-        </div>
         <div class="card-body p-0">
             <table class="table table-hover mb-0 table-striped" id="clientsTable">
                 <thead class="table-light">
@@ -102,7 +109,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for client in topClients %}
+                    {% for client in clients %}
                         <tr>
                             <td>{{ client.nom }}</td>
                             <td>{{ client.email }}</td>
@@ -110,7 +117,13 @@
                             <td>{{ client.societe }}</td>
                             <td>
                                 <a href="{{ path('app_client_show', {'id': client.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                                <a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                                {% if app.user.email == 'sowbassirou926@mail.com' %}
+                                    <a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                                    <form action="{{ path('app_client_delete', {'id': client.id}) }}" method="post" style="display:inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ client.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                    </form>
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}
@@ -123,29 +136,33 @@
         </div>
     </div>
 
-    {# Notifications clients du jour #}
-    <div class="card shadow mb-4">
-        <div class="card-header fw-bold bg-white">Notifications</div>
-        <div class="card-body">
-            <ul class="list-group list-group-flush">
-                {% for client in newClientsToday %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Nouveau client ajouté : {{ client.nom }}
-                        <span class="badge bg-success rounded-pill">{{ client.createdAt|date('H:i') }}</span>
-                    </li>
-                {% else %}
-                    <li class="list-group-item text-muted">Aucun nouveau client aujourd'hui</li>
-                {% endfor %}
-            </ul>
+    {# Notifications clients du jour (Sow uniquement) #}
+    {% if app.user.email == 'sowbassirou926@mail.com' %}
+        <div class="card shadow mb-4">
+            <div class="card-header fw-bold bg-white">Notifications</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for client in newClientsToday %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Nouveau client ajouté : {{ client.nom }}
+                            <span class="badge bg-success rounded-pill">{{ client.createdAt|date('H:i', 'Europe/Paris') }}</span>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item text-muted">Aucun nouveau client aujourd'hui</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+ <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Animation hover cartes KPI
     document.querySelectorAll('.hover-scale').forEach(card => {
         card.addEventListener('mouseenter', () => card.style.transform = 'scale(1.05)');
@@ -153,9 +170,9 @@
         card.style.transition = 'transform 0.3s';
     });
 
-    // Graphique évolution clients
+    // Graphiques (inchangés)
     const ctx1 = document.getElementById('clientsEvolutionChart').getContext('2d');
-    const clientsEvolutionChart = new Chart(ctx1, {
+    new Chart(ctx1, {
         type: 'line',
         data: {
             labels: {{ clientsEvolutionLabels|json_encode|raw }},
@@ -172,9 +189,8 @@
         options: { responsive: true }
     });
 
-    // Graphique répartition par société
     const ctx2 = document.getElementById('clientsSocieteChart').getContext('2d');
-    const clientsSocieteChart = new Chart(ctx2, {
+    new Chart(ctx2, {
         type: 'doughnut',
         data: {
             labels: {{ societeLabels|json_encode|raw }},
@@ -195,13 +211,18 @@
         options: { responsive: true }
     });
 
-    // Filtre recherche clients
-    document.getElementById('clientSearch').addEventListener('input', function() {
-        const filter = this.value.toLowerCase();
-        document.querySelectorAll('#clientsTable tbody tr').forEach(row => {
-            const text = row.textContent.toLowerCase();
+    // Recherche clients dans le tableau
+    const searchInput = document.getElementById('clientSearch');
+    const tableRows = document.querySelectorAll('#clientsTable tbody tr');
+
+    searchInput.addEventListener('input', function() {
+        const filter = this.value.trim().toLowerCase();
+        tableRows.forEach(row => {
+            const text = row.textContent.replace(/\s+/g, ' ').toLowerCase(); // nettoyer les espaces et retours à la ligne
             row.style.display = text.includes(filter) ? '' : 'none';
         });
     });
+});
 </script>
+
 {% endblock %}
