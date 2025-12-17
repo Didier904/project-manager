@@ -29,8 +29,9 @@ class Client
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'clients')]
-    #[ORM\JoinColumn(nullable: true)]
+    // 🔥 IMPORTANT : nullable = true (clients visibles par tous)
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $user = null;
 
     public function __construct()
@@ -47,7 +48,7 @@ class Client
     {
         return $this->nom;
     }
-    public function setNom(string $nom): static
+    public function setNom(string $nom): self
     {
         $this->nom = $nom;
         return $this;
@@ -57,7 +58,7 @@ class Client
     {
         return $this->email;
     }
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
         return $this;
@@ -67,7 +68,7 @@ class Client
     {
         return $this->telephone;
     }
-    public function setTelephone(string $telephone): static
+    public function setTelephone(string $telephone): self
     {
         $this->telephone = $telephone;
         return $this;
@@ -77,7 +78,7 @@ class Client
     {
         return $this->societe;
     }
-    public function setSociete(string $societe): static
+    public function setSociete(string $societe): self
     {
         $this->societe = $societe;
         return $this;
@@ -87,17 +88,19 @@ class Client
     {
         return $this->createdAt;
     }
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
+    // ✅ ACCEPTE BIEN NULL → plus de soulignement
     public function getUser(): ?User
     {
         return $this->user;
     }
-    public function setUser(?User $user): static
+
+    public function setUser(?User $user): self
     {
         $this->user = $user;
         return $this;

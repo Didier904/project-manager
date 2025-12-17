@@ -14,62 +14,64 @@ class DashboardController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        $user = $this->getUser();
-        $clients = $clientRepository->findBy(['user' => $user]);
+        // Tous les utilisateurs voient les mêmes clients
+        $clients = $clientRepository->findAllOrdered();
 
-        // --- KPI ---
+        // KPI
         $totalClients = count($clients);
         $now = new \DateTime();
         $currentMonth = $now->format('m');
 
-        $activeClientsThisMonth = count(array_filter($clients, fn($c) => $c->getCreatedAt() && $c->getCreatedAt()->format('m') === $currentMonth));
+        $activeClientsThisMonth = count(array_filter(
+            $clients,
+            fn($c) => $c->getCreatedAt() && $c->getCreatedAt()->format('m') === $currentMonth
+        ));
 
-        // --- Top 5 clients récents ---
+        // Top 5 récents
         usort($clients, fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
         $topClients = array_slice($clients, 0, 5);
 
-        // --- Clients ajoutés aujourd'hui ---
+        // Notifications du jour
         $today = $now->format('Y-m-d');
-        $newClientsToday = array_filter($clients, fn($c) => $c->getCreatedAt() && $c->getCreatedAt()->format('Y-m-d') === $today);
+        $newClientsToday = array_filter(
+            $clients,
+            fn($c) => $c->getCreatedAt() && $c->getCreatedAt()->format('Y-m-d') === $today
+        );
 
-        // --- Graphique évolution clients (6 derniers mois) ---
+        // Graphiques
         $clientsEvolutionLabels = [];
         $clientsEvolutionData = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $monthDate = new \DateTime("-$i months");
-            $monthLabel = $monthDate->format('M');
-            $monthNum = $monthDate->format('m');
 
-            $clientsEvolutionLabels[] = $monthLabel;
-            $count = count(array_filter($clients, fn($c) => $c->getCreatedAt() && $c->getCreatedAt()->format('m') === $monthNum));
-            $clientsEvolutionData[] = $count;
+        for ($i = 5; $i >= 0; $i--) {
+            $date = new \DateTime("-$i months");
+            $label = $date->format('M');
+            $month = $date->format('m');
+
+            $clientsEvolutionLabels[] = $label;
+            $clientsEvolutionData[] = count(array_filter(
+                $clients,
+                fn($c) => $c->getCreatedAt() && $c->getCreatedAt()->format('m') === $month
+            ));
         }
 
-        // --- Répartition par société ---
+        // Répartition société
         $societeCountsMap = [];
         foreach ($clients as $client) {
             $societe = $client->getSociete() ?? 'Non défini';
-            if (!isset($societeCountsMap[$societe])) {
-                $societeCountsMap[$societe] = 0;
-            }
-            $societeCountsMap[$societe]++;
+            $societeCountsMap[$societe] = ($societeCountsMap[$societe] ?? 0) + 1;
         }
-        $societeLabels = array_keys($societeCountsMap);
-        $societeCounts = array_values($societeCountsMap);
-
-        // --- Revenus estimés ---
-        $revenus = 0; // à remplacer si tu ajoutes un champ revenu
 
         return $this->render('dashboard/dashboard.html.twig', [
-            'topClients' => $topClients,
-            'newClientsToday' => $newClientsToday,
+            'clients' => $clients,
             'totalClients' => $totalClients,
             'activeClientsThisMonth' => $activeClientsThisMonth,
-            'revenus' => $revenus,
+            'topClients' => $topClients,
+            'newClientsToday' => $newClientsToday,
             'clientsEvolutionLabels' => $clientsEvolutionLabels,
             'clientsEvolutionData' => $clientsEvolutionData,
-            'societeLabels' => $societeLabels,
-            'societeCounts' => $societeCounts,
+            'societeLabels' => array_keys($societeCountsMap),
+            'societeCounts' => array_values($societeCountsMap),
+            'revenus' => 0,
         ]);
     }
 }

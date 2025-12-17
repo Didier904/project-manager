@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Client;
+use App\Entity\User;
 use App\Form\ClientType;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,38 +13,62 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/client')]
-final class ClientController extends AbstractController
+class ClientController extends AbstractController
 {
-    #[Route(name: 'app_client_index', methods: ['GET'])]
+    #[Route('', name: 'app_client_index', methods: ['GET'])]
     public function index(ClientRepository $clientRepository): Response
     {
         $user = $this->getUser();
 
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // ADMIN voit tout
+        if ($user->getEmail() === 'sowbassirou926@mail.com') {
+            $clients = $clientRepository->findAllOrdered();
+        } else {
+            // Employés voient aussi tout (logique équipe)
+            $clients = $clientRepository->findAllOrdered();
+        }
+
         return $this->render('client/gestion.html.twig', [
-            'clients' => $clientRepository->findBy(['user' => $user]),
+            'clients' => $clients,
         ]);
     }
 
     #[Route('/new', name: 'app_client_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // ADMIN UNIQUE
+        if ($user->getEmail() !== 'sowbassirou926@mail.com') {
+            throw $this->createAccessDeniedException('Seul l’admin peut créer un client.');
+        }
+
         $client = new Client();
-        $client->setUser($this->getUser()); // Associe l'utilisateur connecté
         $form = $this->createForm(ClientType::class, $client);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $client->setCreatedAt(new \DateTime());
-            $entityManager->persist($client);
-            $entityManager->flush();
 
-            $this->addFlash('success', 'Le client "' . $client->getNom() . '" a été ajouté avec succès !');
+            // Client partagé à toute l’équipe
+            $client->setUser(null);
+
+            $em->persist($client);
+            $em->flush();
+
+            $this->addFlash('success', 'Client ajouté avec succès');
 
             return $this->redirectToRoute('app_dashboard');
         }
 
         return $this->render('client/new.html.twig', [
-            'client' => $client,
             'form' => $form,
         ]);
     }
@@ -51,39 +76,57 @@ final class ClientController extends AbstractController
     #[Route('/{id}', name: 'app_client_show', methods: ['GET'])]
     public function show(Client $client): Response
     {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->render('client/show.html.twig', [
             'client' => $client,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_client_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Client $client, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Client $client, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+
+        if (!$user instanceof User || $user->getEmail() !== 'sowbassirou926@mail.com') {
+            throw $this->createAccessDeniedException();
+        }
+
         $form = $this->createForm(ClientType::class, $client);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-            $this->addFlash('success', 'Le client "' . $client->getNom() . '" a été mis à jour !');
+            $em->flush();
+            $this->addFlash('success', 'Client modifié');
 
-            return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_dashboard');
         }
 
         return $this->render('client/edit.html.twig', [
-            'client' => $client,
             'form' => $form,
+            'client' => $client,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_client_delete', methods: ['POST'])]
-    public function delete(Request $request, Client $client, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'app_client_delete', methods: ['POST'])]
+    public function delete(Request $request, Client $client, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $client->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($client);
-            $entityManager->flush();
-            $this->addFlash('success', 'Le client "' . $client->getNom() . '" a été supprimé.');
+        $user = $this->getUser();
+
+        if (!$user instanceof User || $user->getEmail() !== 'sowbassirou926@mail.com') {
+            throw $this->createAccessDeniedException();
         }
 
-        return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
+        if ($this->isCsrfTokenValid('delete' . $client->getId(), $request->request->get('_token'))) {
+            $em->remove($client);
+            $em->flush();
+            $this->addFlash('success', 'Client supprimé');
+        }
+
+        return $this->redirectToRoute('app_dashboard');
     }
 }
