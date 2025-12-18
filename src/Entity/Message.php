@@ -2,16 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User;
 
-#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Entity(repositoryClass: "App\Repository\MessageRepository")]
 class Message
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -22,21 +20,16 @@ class Message
     #[ORM\JoinColumn(nullable: false)]
     private ?User $recipient = null;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: "text")]
     private ?string $content = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: "datetime")]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private bool $isRead = false; // Ajout avec valeur par défaut false
+    #[ORM\Column(type: "boolean")]
+    private bool $isRead = false;
 
-    public function __construct()
-    {
-        $this->createdAt = new \DateTime();
-        $this->isRead = false;
-    }
-
+    // --- GETTERS & SETTERS ---
     public function getId(): ?int
     {
         return $this->id;
@@ -46,8 +39,7 @@ class Message
     {
         return $this->sender;
     }
-
-    public function setSender(User $sender): self
+    public function setSender(?User $sender): self
     {
         $this->sender = $sender;
         return $this;
@@ -57,8 +49,7 @@ class Message
     {
         return $this->recipient;
     }
-
-    public function setRecipient(User $recipient): self
+    public function setRecipient(?User $recipient): self
     {
         $this->recipient = $recipient;
         return $this;
@@ -68,7 +59,6 @@ class Message
     {
         return $this->content;
     }
-
     public function setContent(string $content): self
     {
         $this->content = $content;
@@ -79,18 +69,16 @@ class Message
     {
         return $this->createdAt;
     }
-
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getIsRead(): bool
+    public function isRead(): bool
     {
         return $this->isRead;
     }
-
     public function setIsRead(bool $isRead): self
     {
         $this->isRead = $isRead;

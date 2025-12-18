@@ -1,15 +1,93 @@
-<h3>Chat avec {{ recipient.email }}</h3>
+{% extends 'base.html.twig' %}
 
-<div class="chat-box border p-3 mb-3" style="height:300px; overflow-y:auto;">
-    {% for msg in messages %}
-        <div class="mb-2 {{ msg.sender == app.user ? 'text-end' : 'text-start' }}">
-            <b>{{ msg.sender.email }}:</b> {{ msg.content }}
-            <small class="text-muted">{{ msg.createdAt|date('H:i') }}</small>
+{% block title %}Chat avec {{ recipient.email }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h3 class="mb-4 text-center">Conversation avec {{ recipient.email }}</h3>
+
+    <div class="card shadow-sm">
+        <div id="chat-box" class="card-body p-3" style="max-height: 500px; overflow-y: auto; background-color:rgb(131, 148, 165);">
+            {% for msg in messages %}
+                <div class="d-flex mb-3 {{ msg.sender.id == app.user.id ? 'justify-content-end' : 'justify-content-start' }}">
+                    {% if msg.sender.id != app.user.id %}
+                        <div class="me-2">
+                            <div class="avatar rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                                {{ msg.sender.email|slice(0,1)|upper }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="message p-2 rounded {{ msg.sender.id == app.user.id ? 'bg-success text-white' : 'bg-light text-dark' }}" style="max-width: 70%;">
+                            {{ msg.content }}
+                        </div>
+                        <small class="text-muted d-block mt-1 {{ msg.sender.id == app.user.id ? 'text-end' : 'text-start' }}">
+                            {{ msg.createdAt|date('d/m/Y H:i', 'Europe/Paris') }}
+                        </small>
+
+                        {% if msg.sender.id == app.user.id %}
+                            <div class="mt-1 d-flex justify-content-end gap-2">
+                                <a href="{{ path('app_chat_edit_message', {'id': msg.id, 'recipientId': recipient.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                                <form action="{{ path('app_chat_delete_message', {'id': msg.id, 'recipientId': recipient.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer ce message ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ msg.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if msg.sender.id == app.user.id %}
+                        <div class="ms-2">
+                            <div class="avatar rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                                {{ msg.sender.email|slice(0,1)|upper }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Aucun message pour l'instant.</p>
+            {% endfor %}
         </div>
-    {% endfor %}
+    </div>
+
+    {{ form_start(form) }}
+        <div class="input-group mt-3">
+            {{ form_widget(form.content, {'attr': {'placeholder': 'Écrire un message... (vous pouvez mentionner @email)', 'class': 'form-control'}}) }}
+            <button class="btn btn-primary" type="submit">Envoyer</button>
+        </div>
+    {{ form_end(form) }}
+
+    <div class="text-center mt-3">
+        <a href="{{ path('app_chat_inbox') }}" class="btn btn-outline-secondary">Retour à la boîte de réception</a>
+    </div>
 </div>
 
-{{ form_start(form) }}
-{{ form_widget(form) }}
-<button class="btn btn-primary mt-2">Envoyer</button>
-{{ form_end(form) }}
+<style>
+#chat-box {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+#chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+#chat-box::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+.message {
+    word-wrap: break-word;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.avatar {
+    font-weight: bold;
+    font-size: 1rem;
+}
+</style>
+
+<script>
+    // Scroll automatique vers le dernier message
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}
