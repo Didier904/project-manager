@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row vh-100">
+
+        <!-- COLONNE GAUCHE : CONVERSATIONS -->
+        <div class="col-md-4 col-lg-3 border-end bg-dark p-0">
+            <div class="p-3 border-bottom fw-bold text-white">
+                Conversations
+            </div>
+
+            <div class="list-group list-group-flush">
+                {% for msg in conversations %}
+                    {% set other = msg.sender.id == app.user.id ? msg.recipient : msg.sender %}
+                    <a href="{{ path('app_chat', {'recipientId': other.id}) }}"
+                       class="list-group-item list-group-item-action bg-dark text-white border-0 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>{{ other.email }}</strong>
+                            {% if not msg.isRead and msg.recipient == app.user %}
+                                <span class="badge bg-danger">●</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">
+                            {{ msg.content|slice(0,40) }}{% if msg.content|length > 40 %}…{% endif %}
+                        </small>
+                    </a>
+                {% else %}
+                    <div class="p-3 text-muted text-center">
+                        Aucune conversation
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- COLONNE DROITE : CONVERSATION -->
+        <div class="col-md-8 col-lg-9 d-flex flex-column p-0 bg-white">
+
+            {% if recipient %}
+                <!-- HEADER -->
+                <div class="p-3 border-bottom fw-bold">
+                    Conversation avec {{ recipient.email }}
+                </div>
+
+                <!-- MESSAGES -->
+                <div class="flex-grow-1 p-3 overflow-auto" id="chat-box">
+                    {% for msg in messages %}
+                        <div class="d-flex mb-2 {{ msg.sender == app.user ? 'justify-content-end' : 'justify-content-start' }}">
+                            <!-- Avatar -->
+                            <div class="{{ msg.sender == app.user ? 'order-2 ms-2' : 'me-2' }}">
+                                <div class="avatar rounded-circle d-flex align-items-center justify-content-center">
+                                    {{ msg.sender == app.user ? 'V' : msg.sender.email|slice(0,1)|upper }}
+                                </div>
+                            </div>
+
+                            <!-- Message -->
+                            <div class="message-box {{ msg.sender == app.user ? 'sent' : 'received' }}">
+                                {{ msg.content }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">Aucun message pour l'instant.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- FORMULAIRE -->
+                <div class="p-3 border-top bg-light">
+                    {{ form_start(form) }}
+                        <div class="input-group">
+                            {{ form_widget(form.content, {
+                                attr: {
+                                    class: 'form-control',
+                                    placeholder: 'Écrire un message…'
+                                }
+                            }) }}
+                            <button class="btn btn-success" type="submit">Envoyer</button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+
+            {% else %}
+                <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                    <div class="text-center">
+                        <h4>Sélectionne une conversation</h4>
+                        <p>ou envoie un premier message</p>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<script>
+const chatBox = document.getElementById('chat-box');
+if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+<style>
+/* Avatars */
+.avatar {
+    font-weight: bold;
+    font-size: 0.8rem;
+    width: 30px;
+    height: 30px;
+    color: white;
+    background-color: #6c757d;
+}
+.d-flex.justify-content-end .avatar {
+    background-color: #28a745;
+}
+
+/* Messages */
+.message-box {
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    max-width: 300px;
+    font-size: 0.9rem;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    display: inline-block;
+}
+.message-box.sent {
+    background-color: #28a745;
+    color: white;
+}
+.message-box.received {
+    background-color: #f1f1f1;
+    color: #000;
+}
+
+/* Scroll */
+#chat-box {
+    scrollbar-width: thin;
+}
+
+/* Conversations list */
+.list-group-item {
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}

@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}KAMIKASSE – Agence digitale{% endblock %}</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap -->
@@ -26,13 +25,8 @@
             flex-direction: column;
         }
 
-        h1, h2, h3, h4 {
-            letter-spacing: -0.03em;
-        }
-
-        section {
-            padding: 6rem 0;
-        }
+        h1, h2, h3, h4 { letter-spacing: -0.03em; }
+        section { padding: 6rem 0; }
 
         /* NAVBAR */
         .navbar {
@@ -41,95 +35,35 @@
             border-bottom: 1px solid rgba(255,255,255,0.08);
             height: 120px;
         }
+        .navbar-brand { display: flex; align-items: center; gap: 1.2rem; font-weight: 900; letter-spacing: 0.35em; font-size: 1.6rem; }
+        .navbar-brand img { height: 64px; width: auto; }
+        .nav-link { color: rgba(255,255,255,0.85) !important; margin-left: 1.5rem; font-weight: 600; font-size: 1.05rem; letter-spacing: 0.04em; }
+        .nav-link:hover { color: #ffffff !important; }
 
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            font-weight: 900;
-            letter-spacing: 0.35em;
-            font-size: 1.6rem;
-        }
-
-        .navbar-brand img {
-            height: 64px;
-            width: auto;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.85) !important;
-            margin-left: 1.5rem;
-            font-weight: 600;
-            font-size: 1.05rem;
-            letter-spacing: 0.04em;
-        }
-
-        .nav-link:hover {
-            color: #ffffff !important;
-        }
-
-        /* GLASS */
-        .glass {
-            background: rgba(255,255,255,0.06);
-            backdrop-filter: blur(14px);
-            border-radius: 1.2rem;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        /* BUTTONS */
-        .btn-primary {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            border-radius: 999px;
-            padding: 0.8rem 2.2rem;
-            font-weight: 600;
-        }
-
-        .btn-outline-light {
-            border-radius: 999px;
-            padding: 0.8rem 2.2rem;
-            font-weight: 600;
+        /* Chat badge */
+        .badge-chat {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
         }
 
         /* FOOTER PREMIUM */
-        .footer-premium {
-            background: linear-gradient(180deg, #020617, #020617);
-            border-top: 1px solid rgba(255,255,255,0.08);
-            margin-top: auto;
-        }
-
-        .footer-premium h5,
-        .footer-premium h6 {
-            letter-spacing: 0.04em;
-        }
-
-        .footer-premium p {
-            color: rgba(255,255,255,0.6);
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-links a {
-            color: rgba(255,255,255,0.65);
-            text-decoration: none;
-            transition: color 0.2s ease;
-            font-weight: 500;
-        }
-
-        .footer-links a:hover {
-            color: #22c55e;
-        }
+        .footer-premium { background: linear-gradient(180deg, #020617,#020617); border-top: 1px solid rgba(255,255,255,0.08); margin-top: auto; }
+        .footer-premium h5, .footer-premium h6 { letter-spacing: 0.04em; }
+        .footer-premium p { color: rgba(255,255,255,0.6); }
+        .footer-links li { margin-bottom: 0.5rem; }
+        .footer-links a { color: rgba(255,255,255,0.65); text-decoration: none; transition: color 0.2s ease; font-weight: 500; }
+        .footer-links a:hover { color: #22c55e; }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
     <div class="container">
-        <a class="navbar-brand" href="{{ path('home') }}">
-            <img src="{{ asset('favicon/kamikasse.png') }}" alt="Kamikasse logo">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ path('home') }}">
+            <img src="{{ asset('favicon/kamikasse.png') }}" alt="Kamikasse">
             <span>KAMIKASSE</span>
         </a>
 
@@ -138,19 +72,54 @@
         </button>
 
         <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
-            <ul class="navbar-nav align-items-center">
-                <li class="nav-item"><a class="nav-link" href="{{ path('home') }}">Agence</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ path('home')}}">Services</a></li>
+            <ul class="navbar-nav align-items-center gap-3">
+
+                <!-- Accueil -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('home') }}">
+                        <i class="bi bi-house-door-fill"></i> Accueil
+                    </a>
+                </li>
 
                 {% if app.user %}
-                    <li class="nav-item"><span class="nav-link">{{ app.user.email }}</span></li>
+                    <!-- Dashboard -->
                     <li class="nav-item">
-                        <a href="{{ path('app_logout') }}" class="btn btn-outline-light btn-sm ms-4">Déconnexion</a>
+                        <a class="nav-link" href="{{ path('app_dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <!-- Chat avec badge -->
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="{{ path('app_chat') }}">
+                            <i class="bi bi-chat-dots-fill"></i> Chat
+                        </a>
+                        {% if unreadCount is defined and unreadCount > 0 %}
+                            <span class="badge bg-danger rounded-pill badge-chat">
+                                {{ unreadCount }}
+                            </span>
+                        {% endif %}
+                    </li>
+
+                    <!-- Utilisateur connecté -->
+                    <li class="nav-item">
+                        <a class="nav-link disabled">
+                            <i class="bi bi-person-circle"></i> {{ app.user.email }}
+                        </a>
+                    </li>
+
+                    <!-- Déconnexion -->
+                    <li class="nav-item">
+                        <a href="{{ path('app_logout') }}" class="btn btn-outline-light btn-sm ms-2">
+                            <i class="bi bi-box-arrow-right"></i> Déconnexion
+                        </a>
                     </li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Connexion</a></li>
+                    <!-- Connexion -->
                     <li class="nav-item">
-                        <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm ms-4">Accéder</a>
+                        <a class="nav-link" href="{{ path('app_login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> Connexion
+                        </a>
                     </li>
                 {% endif %}
             </ul>
@@ -159,7 +128,7 @@
 </nav>
 
 <!-- CONTENT -->
-<main style="margin-top: 120px; flex: 1;">
+<main style="margin-top: 120px; flex:1;">
     {% block body %}{% endblock %}
 </main>
 
@@ -171,11 +140,10 @@
             <!-- COL 1 -->
             <div class="col-md-4">
                 <h5 class="fw-bold mb-3">KAMIKASSE</h5>
-                <p class="mb-3"> est une agence digitale spécialisée dans la création de site internet, d'application mobile, et aussi dans la gestion d'entreprises.</p>
+                <p class="mb-3">Agence digitale spécialisée dans la création de site internet, d'application mobile et gestion d'entreprise.</p>
                 <hr>
-                <h5 class="fw-bold mb-3">NOTRE OBJETIF</h5>
-                <p class="mb-3">Les nouvelles technolgies du digital pour répondre à toute vos attentes !</p>
-                <br>
+                <h5 class="fw-bold mb-3">NOTRE OBJECTIF</h5>
+                <p class="mb-3">Les nouvelles technologies du digital pour répondre à toutes vos attentes !</p>
                 <p class="small mb-0">© {{ "now"|date("Y") }} KAMIKASSE. Tous droits réservés.</p>
             </div>
 
@@ -192,16 +160,11 @@
             <!-- COL 3 -->
             <div class="col-md-4 text-center">
                 <h6 class="fw-bold mb-3">NOUS CONTACTER</h6>
-                <p class="mb-1"> service@kamikasse.fr</p>
-                <p class="mb-3"> Lundi au Vendredi / 08h - 19h</p>
+                <p class="mb-1">service@kamikasse.fr</p>
+                <p class="mb-3">Lundi au Vendredi / 08h - 19h</p>
                 <p class="mb-3">France · Europe</p>
-
-                <!-- Bouton pour afficher le numéro -->
                 <button id="show-phone" class="btn btn-primary btn-sm mb-3 d-block mx-auto">Afficher le numéro</button>
-                
-                <!-- Numéro affiché au-dessus du bouton "Démarrer un projet" -->
                 <p id="phone-number" class="mb-3" style="display:none; font-weight:600;">+33 1 23 45 67 89</p>
-
                 <a href="#contact" class="btn btn-primary btn-sm d-block mx-auto">Démarrer un projet</a>
             </div>
 

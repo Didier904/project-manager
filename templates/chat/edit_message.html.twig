@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modifier le message{% endblock %}
+{% block body %}
+<div class="container py-5">
+    <h3 class="mb-4 text-center">Modifier le message</h3>
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_widget(form.content, {'attr': {'class':'form-control'}}) }}
+        </div>
+        <button class="btn btn-success" type="submit">Enregistrer</button>
+        <a href="{{ path('app_chat_conversation', {'recipientId': recipientId}) }}" class="btn btn-secondary">Annuler</a>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
